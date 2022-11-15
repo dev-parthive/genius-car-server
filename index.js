@@ -5,8 +5,8 @@ const cors = require('cors');
 const jwt = require('jsonwebtoken')
 const app  = express()
 const port = process.env.PORT || 5000;
-const { MongoClient, ServerApiVersion } = require('mongodb');
-const { ObjectID, serialize } = require("bson");
+const { MongoClient, ServerApiVersion, ObjectId,  } = require('mongodb');
+// const { ObjectID, serialize } = require("bson");
 
 //require dotenv 
 require('dotenv').config()
@@ -32,10 +32,10 @@ function verifyJWT (req, res, next){
             return res.status(401).send({message: 'unauthorized access'})
         }
         req.decoded = decoded;
+        next()
         
     })
-    
-    next()
+   
 }
 
 async function run(){
@@ -61,11 +61,13 @@ async function run(){
                 // amra array te convert korbo jate client side a use korte pari
                 const services = await cursor.toArray()
                 res.send(services)
-            })
+            });
+            
             app.get('/services/:id', async(req, res) => {
-              const id  = req.params;  
+              const id  = req.params.id;  
+              console.log(id)
               //   console.log(id)
-              const query = {_id: ObjectID(id)};
+              const query = {_id: ObjectId(id)};
               const service = await servicesCollection.findOne(query); 
                 res.send(service)
               
@@ -101,7 +103,7 @@ async function run(){
             app.patch('/orders/:id', async (req, res) =>{
                 const id = req.params.id;
                 const status = req.body.status
-               const query = { _id: ObjectID(id) }
+               const query = { _id: ObjectId(id) }
                const updateDoc = {
                 $set:{
                     status : status,
@@ -114,7 +116,7 @@ async function run(){
                 //order cancel 
             app.delete('/orders/:id', async(req, res)=>{
                 const id = req.params.id;
-                const query = {_id: ObjectID(id)}
+                const query = {_id: ObjectId(id)}
                 const result = await orderCollection.deleteOne(query) 
                 res.send(result)
             })
@@ -133,7 +135,7 @@ run() .catch( err => console.log(err))
 // console.log(process.env.DB_PASSWORD)
 
 app.get('/', (req, res) =>{
-    res.send('Genius car server running')
+    res.send('Genius car server running................')
 })
 app.listen(port, ()=>{
     console.log('genius car server running on port' , port );
