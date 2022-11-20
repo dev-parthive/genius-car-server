@@ -55,9 +55,26 @@ async function run(){
 
             app.get('/services', async(req, res)=>{
                 //data gula k kujar jonno conditon set kora
-                const query = {}
+                // const query = {price: {$gt: 20, $lt: 100}}
+                // const query = {price: {$eq: 20}}
+                // const query = {price: {$gte: 100}}
+                const search = req.query.search
+                let query  = {} 
+                if(search.length){
+                    query = {
+                        $text: {
+                            $search: search 
+                        } 
+                        
+                         
+                        
+                    }
+
+                }
+                console.log(search)
+                const order = req.query.order === 'asc' ? 1 : -1
                 // cursor diye kojar kaj ta kora hoy 
-                const cursor =servicesCollection.find(query)
+                const cursor =servicesCollection.find(query).sort({price: order})
                 // amra array te convert korbo jate client side a use korte pari
                 const services = await cursor.toArray()
                 res.send(services)
